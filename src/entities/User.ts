@@ -18,10 +18,6 @@ export class User { // Table
     updatedAt = new Date();
 
     @Field()
-    @Property({type: 'text'}) // Type for SQL type in table
-    title!: String;
-
-    @Field()
     @Property({type: 'text', unique: true}) // Type for SQL type in table
     username!: String;
 

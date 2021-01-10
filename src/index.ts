@@ -8,6 +8,7 @@ import {ApolloServer} from 'apollo-server-express';
 import {buildSchema} from 'type-graphql'
 import { helloResolver } from "./resolvers/hello";
 import { postResolver } from "./resolvers/post";
+import { UserResolver } from "./resolvers/user";
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig);
@@ -24,7 +25,7 @@ const main = async () => {
     // Creating an end point for graphql on our express server
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [helloResolver, postResolver],
+            resolvers: [helloResolver, postResolver, UserResolver],
             validate: false
         }),
         context: () => ({ em: orm.em }) // Object that is accessible to all resolvers
