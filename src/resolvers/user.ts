@@ -13,7 +13,7 @@ class UsernamePasswordInput {
 }
 
 @Resolver()
-export class UserResolver {
+export class userResolver {
     @Mutation(() => User)
     async register(
         @Arg('options') options: UsernamePasswordInput, // object instead of multiple args

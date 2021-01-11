@@ -24,7 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserResolver = void 0;
+exports.userResolver = void 0;
 const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
@@ -41,7 +41,7 @@ __decorate([
 UsernamePasswordInput = __decorate([
     type_graphql_1.InputType()
 ], UsernamePasswordInput);
-let UserResolver = class UserResolver {
+let userResolver = class userResolver {
     register(options, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             const hashedPass = yield argon2_1.default.hash(options.password);
@@ -61,9 +61,9 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UsernamePasswordInput, Object]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "register", null);
-UserResolver = __decorate([
+], userResolver.prototype, "register", null);
+userResolver = __decorate([
     type_graphql_1.Resolver()
-], UserResolver);
-exports.UserResolver = UserResolver;
+], userResolver);
+exports.userResolver = userResolver;
 //# sourceMappingURL=user.js.map
