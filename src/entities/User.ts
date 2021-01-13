@@ -19,10 +19,10 @@ export class User { // Table
 
     @Field()
     @Property({type: 'text', unique: true}) // Type for SQL type in table
-    username!: String;
+    username!: string;
 
 
     @Property({type: 'text'}) // Type for SQL type in table
-    password!: String;
+    password!: string;
 
 }
