@@ -13,7 +13,8 @@ import "dotenv/config"
 import cookieParser from 'cookie-parser';
 import { verify } from "jsonwebtoken";
 import { User } from "./entities/User";
-import { createAccessToken } from "./auth";
+import { createAccessToken, createRefreshToken } from "./auth";
+import { sendRefreshToken } from "./sendRefreshToken";
 
 const main = async ()  => {
     const orm = await MikroORM.init(microConfig);
@@ -37,7 +38,9 @@ const main = async ()  => {
         if(!token){
             return res.send({ok: false, accessToken: ''});
         }
+
         let payload: any = null;
+
         try{
             payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)
         } catch(err) {
@@ -54,6 +57,8 @@ const main = async ()  => {
         if(!user){
             return res.send({ok: "notFound", accessToken: ''});
         }
+
+        sendRefreshToken(res, createRefreshToken(user));
 
         return res.send({ok: true, accessToken: createAccessToken(user)});
 

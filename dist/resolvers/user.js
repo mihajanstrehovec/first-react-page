@@ -30,6 +30,7 @@ const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 const auth_1 = require("../auth");
 const isAuth_1 = require("../isAuth");
+const sendRefreshToken_1 = require("../sendRefreshToken");
 let UsernamePasswordInput = class UsernamePasswordInput {
 };
 __decorate([
@@ -151,9 +152,7 @@ let userResolver = class userResolver {
                     ],
                 };
             }
-            res.cookie('jid', auth_1.createRefreshToken(user), {
-                httpOnly: true
-            });
+            sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(user));
             return {
                 accessToken: auth_1.createAccessToken(user)
             };

@@ -6,6 +6,7 @@ import argon2 from "argon2" // Ker ima datoteko .d.ts ne rabimo importat types i
 import { MyContextRefreshCokie } from 'src/MyContextRefreshCokie'
 import { createAccessToken, createRefreshToken } from '../auth'
 import { isAuth } from '../isAuth'
+import { sendRefreshToken } from '../sendRefreshToken'
 
 
 @InputType()
@@ -130,13 +131,7 @@ export class userResolver {
 
         // Login succesfull
 
-        res.cookie(
-            'jid',  
-            createRefreshToken(user), // Funkcija za kreacijo piškotka, ki se nahaja v ./src/auth.ts
-            {
-                httpOnly: true
-            }
-        );
+        sendRefreshToken(res, createRefreshToken(user));
 
         return {
             accessToken: createAccessToken(user) // Funkcija za kreacijo access tokena, ki se nahaja v ./src/auth.ts

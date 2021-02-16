@@ -26,6 +26,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const jsonwebtoken_1 = require("jsonwebtoken");
 const User_1 = require("./entities/User");
 const auth_1 = require("./auth");
+const sendRefreshToken_1 = require("./sendRefreshToken");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
@@ -50,6 +51,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!user) {
             return res.send({ ok: "notFound", accessToken: '' });
         }
+        sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(user));
         return res.send({ ok: true, accessToken: auth_1.createAccessToken(user) });
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
