@@ -22,10 +22,36 @@ const hello_1 = require("./resolvers/hello");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
 require("dotenv/config");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const jsonwebtoken_1 = require("jsonwebtoken");
+const User_1 = require("./entities/User");
+const auth_1 = require("./auth");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
     const app = express_1.default();
+    app.use(cookie_parser_1.default());
+    app.post("/refresh_token", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const token = req.cookies.jid;
+        if (!token) {
+            return res.send({ ok: false, accessToken: '' });
+        }
+        let payload = null;
+        try {
+            payload = jsonwebtoken_1.verify(token, process.env.REFRESH_TOKEN_SECRET);
+        }
+        catch (err) {
+            console.log("token: ", token);
+            console.log("err: ", err);
+            return res.send({ ok: false, accessToken: '' });
+        }
+        console.log("payyyyyyy", payload);
+        const user = yield orm.em.findOne(User_1.User, { id: payload.userId });
+        if (!user) {
+            return res.send({ ok: "notFound", accessToken: '' });
+        }
+        return res.send({ ok: true, accessToken: auth_1.createAccessToken(user) });
+    }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
             resolvers: [hello_1.helloResolver, post_1.postResolver, user_1.userResolver],
