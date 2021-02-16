@@ -9,6 +9,7 @@ import {buildSchema} from 'type-graphql'
 import { helloResolver } from "./resolvers/hello";
 import { postResolver } from "./resolvers/post";
 import { userResolver } from "./resolvers/user";
+import "dotenv/config"
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig);
@@ -22,13 +23,21 @@ const main = async () => {
 
     const app = express(); // Express app
 
+    
+
     // Creating an end point for graphql on our express server
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
             resolvers: [helloResolver, postResolver, userResolver],
             validate: false
         }),
-        context: () => ({ em: orm.em }) // Object that is accessible to all resolvers
+        context: ({ req, res }) => ({ // Object that is accessible to all resolvers
+            em: orm.em,
+            req,
+            res
+        }) 
+        
+        
     });
 
     apolloServer.applyMiddleware({ app });
@@ -39,10 +48,15 @@ const main = async () => {
     });
 
 
+
+
 };
 
 // console.log("hell");
 
+
+
 main().catch(err => {
     console.log(err);
+    
 });

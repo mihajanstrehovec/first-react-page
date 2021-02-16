@@ -2,6 +2,9 @@ import { User } from '../entities/User'
 import { MyContext } from '../types'
 import { Resolver,  Mutation, Arg, InputType, Field, Ctx, ObjectType } from 'type-graphql'
 import argon2 from "argon2" // Ker ima datoteko .d.ts ne rabimo importat types in tsconfig  => Brez {}, ker uporabljajo default import (const argon2 = require(argon2))
+// import {sign} from 'jsonwebtoken'
+import { MyContextRefreshCokie } from 'src/MyContextRefreshCokie'
+import { createAccessToken, createRefreshToken } from '../auth'
 
 
 @InputType()
@@ -30,9 +33,20 @@ class UserResponse{ // What we are returning on login
     user?: User;
 }
 
+@ObjectType()
+class LoginResponse {
+    @Field(() => [FieldError], {nullable: true})
+    errors?: FieldError[]; // ? => return error if user is not found, return user if it is
+
+    @Field({nullable: true})
+    accessToken?: string; 
+
+}
+
 
 @Resolver()
 export class userResolver {
+    // Registration
     @Mutation(() => UserResponse)
     async register(
         @Arg('options') options: UsernamePasswordInput, // object instead of multiple args
@@ -82,11 +96,14 @@ export class userResolver {
    
     }
 
-    @Mutation(() => UserResponse)
+
+    // Login
+    @Mutation(() => LoginResponse)
     async login(
         @Arg('options') options: UsernamePasswordInput, // object instead of multiple args
-        @Ctx() {em}: MyContext
-    ): Promise <UserResponse> {
+        @Ctx() {em}: MyContext,
+        @Ctx() {res}: MyContextRefreshCokie
+    ): Promise <LoginResponse> {
         const user = await em.findOne(User, {username: options.username});
         if(!user){ // handling errors
             return{
@@ -109,8 +126,19 @@ export class userResolver {
                 ],
             };
         }
+
+        // Login succesfull
+
+        res.cookie(
+            'jid',  
+            createRefreshToken(user), // Funkcija za kreacijo piškotka, ki se nahaja v ./src/auth.ts
+            {
+                httpOnly: true
+            }
+        );
+
         return {
-            user
+            accessToken: createAccessToken(user) // Funkcija za kreacijo access tokena, ki se nahaja v ./src/auth.ts
         };
     }
 }

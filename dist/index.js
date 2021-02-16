@@ -21,6 +21,7 @@ const type_graphql_1 = require("type-graphql");
 const hello_1 = require("./resolvers/hello");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
+require("dotenv/config");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
@@ -30,7 +31,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             resolvers: [hello_1.helloResolver, post_1.postResolver, user_1.userResolver],
             validate: false
         }),
-        context: () => ({ em: orm.em })
+        context: ({ req, res }) => ({
+            em: orm.em,
+            req,
+            res
+        })
     });
     apolloServer.applyMiddleware({ app });
     app.listen(4000, () => {
