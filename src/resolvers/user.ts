@@ -1,10 +1,11 @@
 import { User } from '../entities/User'
 import { MyContext } from '../types'
-import { Resolver,  Mutation, Arg, InputType, Field, Ctx, ObjectType } from 'type-graphql'
+import { Resolver,  Mutation, Arg, InputType, Field, Ctx, ObjectType, Query, UseMiddleware } from 'type-graphql'
 import argon2 from "argon2" // Ker ima datoteko .d.ts ne rabimo importat types in tsconfig  => Brez {}, ker uporabljajo default import (const argon2 = require(argon2))
 // import {sign} from 'jsonwebtoken'
 import { MyContextRefreshCokie } from 'src/MyContextRefreshCokie'
 import { createAccessToken, createRefreshToken } from '../auth'
+import { isAuth } from '../isAuth'
 
 
 @InputType()
@@ -141,4 +142,19 @@ export class userResolver {
             accessToken: createAccessToken(user) // Funkcija za kreacijo access tokena, ki se nahaja v ./src/auth.ts
         };
     }
+
+    @Query(() =>  User)
+    @UseMiddleware(isAuth)
+    getCurrentUsersData(
+        @Ctx() {payload}: MyContextRefreshCokie,
+        @Ctx() {em}: MyContext
+    ): Promise<User | null> {
+
+        const id = parseInt(payload!.userId)
+
+        return em.findOne(User, {id});
+
+        
+    }
+
 }

@@ -29,6 +29,7 @@ const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 const auth_1 = require("../auth");
+const isAuth_1 = require("../isAuth");
 let UsernamePasswordInput = class UsernamePasswordInput {
 };
 __decorate([
@@ -158,6 +159,10 @@ let userResolver = class userResolver {
             };
         });
     }
+    getCurrentUsersData({ payload }, { em }) {
+        const id = parseInt(payload.userId);
+        return em.findOne(User_1.User, { id });
+    }
 };
 __decorate([
     type_graphql_1.Mutation(() => UserResponse),
@@ -176,6 +181,15 @@ __decorate([
     __metadata("design:paramtypes", [UsernamePasswordInput, Object, Object]),
     __metadata("design:returntype", Promise)
 ], userResolver.prototype, "login", null);
+__decorate([
+    type_graphql_1.Query(() => User_1.User),
+    type_graphql_1.UseMiddleware(isAuth_1.isAuth),
+    __param(0, type_graphql_1.Ctx()),
+    __param(1, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], userResolver.prototype, "getCurrentUsersData", null);
 userResolver = __decorate([
     type_graphql_1.Resolver()
 ], userResolver);
